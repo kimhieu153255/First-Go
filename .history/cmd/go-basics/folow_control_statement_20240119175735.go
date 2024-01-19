@@ -1,0 +1,34 @@
+package gobasics
+
+import "fmt"
+
+// for bắt buộc phải có {}
+func CountSum(last int) {
+	result := 0
+	for i := 0; i <= last; i++ {
+		result += i
+	}
+	fmt.Println(result)
+}
+
+// for continued
+func CountSumForContinued(last int) {
+	result, ind := 0, 1
+	for ind <= last {
+		result += ind
+		ind++
+	}
+	fmt.Println(result)
+}
+
+// while in go is for
+func CountSumWhile(last int) {
+	result, ind := 0, 1
+	for ind <= last {
+		result += ind
+		ind++
+	}
+	fmt.Println(result)
+}
+
+
