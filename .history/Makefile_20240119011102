@@ -1,5 +1,0 @@
-BINARY_NAME = main
-.DEFAULT_GOAL := run
-
-build:
-	go build -o $(BINARY_NAME) -v
