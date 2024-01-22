@@ -65,3 +65,10 @@ func TestDefer() {
 	defer fmt.Println("hello") // chạy thứ 2
 	fmt.Println("test defer")  // chạy đầu tiên
 }
+
+func PointerTest() {
+	i := 1
+	z := &i
+	y := &z
+	fmt.Println(**y)
+}

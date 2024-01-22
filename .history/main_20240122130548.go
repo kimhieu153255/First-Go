@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	median := practiceleetcode.LongestPalindrome("cbabad")
+	median := practiceleetcode.LongestPalindrome("babad")
 	fmt.Println(median)
 }

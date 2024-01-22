@@ -7,6 +7,6 @@ import (
 )
 
 func main() {
-	median := practiceleetcode.LongestPalindrome("cbabad")
+	median := practiceleetcode.FindMedianSortedArrays([]int{1, 2}, []int{3, 4})
 	fmt.Println(median)
 }

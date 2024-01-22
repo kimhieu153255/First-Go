@@ -65,3 +65,5 @@ func TestDefer() {
 	defer fmt.Println("hello") // chạy thứ 2
 	fmt.Println("test defer")  // chạy đầu tiên
 }
+
+
