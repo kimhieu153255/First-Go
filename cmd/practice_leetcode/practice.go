@@ -82,3 +82,56 @@ func Reverse(x int) int {
 	}
 	return tempInt
 }
+
+// 8. String to Integer (atoi)
+func MyAtoi(s string) int {
+	s = strings.TrimSpace(s)
+	if len(s) == 0 {
+		return 0
+	}
+
+	var result string
+	if s[0] == '-' || s[0] == '+' {
+		result += string(s[0])
+		s = s[1:]
+	}
+
+	for _, c := range s {
+		if c < '0' || c > '9' {
+			break
+		}
+		result += string(c)
+	}
+
+	if len(result) == 0 || result == "-" || result == "+" {
+		return 0
+	}
+
+	tempInt, _ := strconv.Atoi(result)
+	if tempInt > 2147483647 {
+		return 2147483647
+	} else if tempInt < -2147483648 {
+		return -2147483648
+	}
+	return tempInt
+}
+
+// 9. Palindrome Number
+func IsPalindrome(x int) bool {
+	if x < 0 {
+		return false
+	}
+	s := strconv.Itoa(x)
+	if len(s) <= 1 {
+		return true
+	}
+	for i := 0; i <= len(s)/2; i++ {
+		if s[i] != s[len(s)-1-i] {
+			return false
+		}
+	}
+	return true
+}
+
+// 10. Regular Expression Matching
+

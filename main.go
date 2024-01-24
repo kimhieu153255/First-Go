@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
-
-	practiceleetcode "github.com/kimhieu/first-go/cmd/practice_leetcode"
+	"github.com/kimhieu/first-go/cmd/goroutines"
 )
 
 func main() {
-	median := practiceleetcode.LongestPalindrome("cbabad")
-	fmt.Println(median)
+	goroutines.TestChannelSynchronization()
 }
