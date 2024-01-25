@@ -18,7 +18,3 @@ sql:
             go_type: 'time.Time'
           - db_type: 'uuid'
             go_type: 'github.com/google/uuid.UUID'
-    database:
-      managed: true # true: create database if not exists
-    rules:
-      - sqlc/db-prepare # run sqlc prepare

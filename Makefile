@@ -13,4 +13,10 @@ migrateup:
 migratedown:
 	migrate -path internal/config/db/migration -database "postgresql://root:secret@localhost:5432/testGo?sslmode=disable" -verbose down
 
-.PHONY: createdb dropdb postgres migrateup migratedown
+sqlc:
+	sqlc generate
+
+test:
+	go test -v -cover ./tests/...
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc test
