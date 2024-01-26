@@ -11,7 +11,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	arg := db.CreateUserParams{
-		Email:    "test@gmail.com",
+		Email:    utils.RandomString(10) + "@gmail.com",
 		FullName: utils.RandomString(10),
 		Password: utils.RandomString(10),
 	}

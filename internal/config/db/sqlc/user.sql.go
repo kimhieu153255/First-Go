@@ -88,18 +88,35 @@ func (q *Queries) SelectUser(ctx context.Context, email string) (User, error) {
 	return i, err
 }
 
+const selectUserForUpdate = `-- name: SelectUserForUpdate :one
+select id, email, full_name, password, created_at from users where id = $1 for no key update
+`
+
+func (q *Queries) SelectUserForUpdate(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, selectUserForUpdate, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.Password,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const updateUser = `-- name: UpdateUser :one
-update users set full_name = $2, password = $3 where email = $1 returning id, email, full_name, password, created_at
+update users set full_name = $2, password = $3 where id = $1 returning id, email, full_name, password, created_at
 `
 
 type UpdateUserParams struct {
-	Email    string `json:"email"`
+	ID       int64  `json:"id"`
 	FullName string `json:"full_name"`
 	Password string `json:"password"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, updateUser, arg.Email, arg.FullName, arg.Password)
+	row := q.db.QueryRow(ctx, updateUser, arg.ID, arg.FullName, arg.Password)
 	var i User
 	err := row.Scan(
 		&i.ID,

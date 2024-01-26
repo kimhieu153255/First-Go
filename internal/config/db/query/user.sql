@@ -11,8 +11,7 @@ select * from users order by id;
 delete from users where email = $1;
 
 -- name: UpdateUser :one
-update users set full_name = $2, password = $3 where email = $1 returning *;
+update users set full_name = $2, password = $3 where id = $1 returning *;
 
-
--- --TO UPDATE NO DEADLOCK:
--- SELECT * FROM users WHERE email = $1 FOR NO KEY UPDATE;
+-- name: SelectUserForUpdate :one
+select * from users where id = $1 for no key update;
