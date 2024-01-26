@@ -40,6 +40,16 @@ func (store *SQLStore) UpdateUserUseStore(ctx context.Context, arg UpdateUserTxP
 	var result UpdateUserResult
 	// to start a transaction we need to use ExecTx (in this, we have a lot of queries)
 	err := store.ExecTx(ctx, func(q *Queries) error {
+		_, err := q.CreateUser(ctx, CreateUserParams{
+			Email:    arg.Email,
+			FullName: arg.FullName,
+			Password: arg.Password,
+		})
+
+		if err != nil {
+			return err
+		}
+
 		user, err := q.UpdateUser(ctx, UpdateUserParams{
 			Email:    arg.Email,
 			Password: arg.Password,
@@ -49,6 +59,7 @@ func (store *SQLStore) UpdateUserUseStore(ctx context.Context, arg UpdateUserTxP
 		if err != nil {
 			return err
 		}
+
 		fmt.Println("user", user)
 		result.User = user
 		return nil
