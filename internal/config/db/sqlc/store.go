@@ -27,7 +27,7 @@ func NewStore(connPool *pgxpool.Pool) Store {
 }
 
 type UpdateUserTxParams struct {
-	Email    string `json:"email"`
+	ID       int64
 	Password string `json:"password"`
 	FullName string `json:"full_name"`
 }
