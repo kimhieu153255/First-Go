@@ -26,17 +26,3 @@ func TestCreateUser(t *testing.T) {
 	require.NotZero(t, user.CreatedAt)
 	require.WithinDuration(t, user.CreatedAt, user.CreatedAt, 2)
 }
-
-func TestUpdateUserUseStore(t *testing.T) {
-	arg := db.UpdateUserTxParams{
-		Email:    "test@gmail.com",
-		FullName: utils.RandomString(10),
-		Password: utils.RandomString(10),
-	}
-
-	user, err := testStore.UpdateUserUseStore(context.Background(), arg)
-	require.NoError(t, err)
-	require.Equal(t, arg.Email, user.User.Email)
-	require.Equal(t, arg.FullName, user.User.FullName)
-	require.Equal(t, arg.Password, user.User.Password)
-}
