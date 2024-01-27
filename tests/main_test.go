@@ -8,18 +8,18 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	db "github.com/kimhieu/first-go/internal/config/db/sqlc"
+	config_env "github.com/kimhieu/first-go/internal/config/env"
 	_ "github.com/lib/pq"
-)
-
-const (
-	dbDriver = "pgx"
-	dbSource = "postgres://root:secret@localhost:5432/testGo?sslmode=disable"
 )
 
 var testStore db.Store
 
 func TestMain(m *testing.M) {
-	connPool, err := pgxpool.New(context.Background(), dbSource)
+	config, err := config_env.NewConfig("../")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
+	connPool, err := pgxpool.New(context.Background(), config.DBSource)
 	if err != nil {
 		log.Fatal("cannot connect to db:", err)
 	}
