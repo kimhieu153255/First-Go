@@ -5,9 +5,9 @@ import (
 	"log"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	api_v1 "github.com/kimhieu/first-go/internal/api/v1"
-	db "github.com/kimhieu/first-go/internal/config/db/sqlc"
-	config_env "github.com/kimhieu/first-go/internal/config/env"
+	api_v1 "github.com/kimhieu153255/first-go/internal/api/v1"
+	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
+	config_env "github.com/kimhieu153255/first-go/internal/config/env"
 )
 
 func main() {

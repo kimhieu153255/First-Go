@@ -2,7 +2,7 @@ package api_v1
 
 import (
 	"github.com/gin-gonic/gin"
-	db "github.com/kimhieu/first-go/internal/config/db/sqlc"
+	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
 )
 
 type Server struct {

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	db "github.com/kimhieu/first-go/internal/config/db/sqlc"
-	"github.com/kimhieu/first-go/pkg/utils"
+	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
+	"github.com/kimhieu153255/first-go/pkg/utils"
 	"github.com/stretchr/testify/require"
 )
 

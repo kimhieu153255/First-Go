@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	db "github.com/kimhieu/first-go/internal/config/db/sqlc"
-	error "github.com/kimhieu/first-go/pkg/handlers"
+	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
+	error "github.com/kimhieu153255/first-go/pkg/handlers"
 )
 
 type createUserRequest struct {

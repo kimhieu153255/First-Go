@@ -17,9 +17,12 @@ sqlc:
 	sqlc generate
 
 test:
-	go test -v -cover ./tests/...
+	go test -v -cover ./tests/direct/... -coverpkg ./internal/config/db/sqlc/...
 
 server:
 	go run main.go
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server
+mock:
+	mockgen -package mockdb -destination internal/config/db/mock/store.go github.com/kimhieu153255/first-go/internal/config/db/sqlc Store
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server mock
