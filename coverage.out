@@ -1,0 +1,10 @@
+mode: set
+github.com/kimhieu153255/first-go/internal/api/v1/server.go:13.40,21.2 5 1
+github.com/kimhieu153255/first-go/internal/api/v1/server.go:23.51,25.2 1 0
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:17.52,19.49 2 1
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:19.49,22.3 2 1
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:24.2,31.16 3 1
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:31.16,32.46 1 1
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:32.46,35.4 2 1
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:36.3,37.9 2 0
+github.com/kimhieu153255/first-go/internal/api/v1/user.go:40.2,40.31 1 1

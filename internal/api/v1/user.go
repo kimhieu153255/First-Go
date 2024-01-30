@@ -21,24 +21,21 @@ func (server *Server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	user, _ := server.store.SelectUser(ctx, req.Email)
-	if user != (db.User{}) {
-		ctx.JSON(http.StatusBadRequest, error.NewBadRequestError("email already exist"))
-		return
-	}
-
 	arg := db.CreateUserParams{
 		Email:    req.Email,
 		FullName: req.FullName,
 		Password: req.Password,
 	}
 
-	user, err := server.store.CreateUser(ctx, arg)
+	user, err := server.Store.CreateUser(ctx, arg)
 	if err != nil {
+		if db.ErrorCode(err) == db.UniqueViolation {
+			ctx.JSON(http.StatusForbidden, error.NewForbiddenError(err.Error()))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, error.NewInternalServerError())
 		return
 	}
 
 	ctx.JSON(http.StatusOK, user)
-
 }
