@@ -27,7 +27,7 @@ func NewStore(connPool *pgxpool.Pool) Store {
 }
 
 type UpdateUserTxParams struct {
-	ID       int64
+	ID       int64  `json:"id"`
 	Password string `json:"password"`
 	FullName string `json:"full_name"`
 }
@@ -41,12 +41,13 @@ func (store *SQLStore) UpdateUserUseStore(ctx context.Context, arg UpdateUserTxP
 	// to start a transaction we need to use ExecTx (in this, we have a lot of queries)
 	err := store.ExecTx(ctx, func(q *Queries) error {
 
-		_, err := q.SelectUserForUpdate(ctx, 1)
+		_, err := q.SelectUserForUpdate(ctx, arg.ID)
 		if err != nil {
 			return err
 		}
+
 		user, err := q.UpdateUser(ctx, UpdateUserParams{
-			ID:       1,
+			ID:       arg.ID,
 			Password: arg.Password,
 			FullName: arg.FullName,
 		})

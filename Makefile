@@ -1,11 +1,14 @@
 postgres:
-	docker run --name postgres16 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:16-alpine
+	sudo docker run --name postgres16 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres:16-alpine
+
+droppostgres:
+	sudo docker rm -f postgres16
 
 createdb:
-	docker exec -it postgres16 createdb --username=root --owner=root testGo
+	sudo docker exec -it postgres16 createdb --username=root --owner=root testGo
 
 dropdb:
-	docker exec -it postgres16 dropdb testGo
+	sudo docker exec -it postgres16 dropdb testGo
 
 migrateup:
 	migrate -path internal/config/db/migration -database "postgresql://root:secret@localhost:5432/testGo?sslmode=disable" -verbose up
@@ -17,7 +20,7 @@ sqlc:
 	sqlc generate
 
 test:
-	go test -v -cover ./tests/direct/... -coverpkg ./internal/config/db/sqlc/...
+	go test -v -cover ./tests/unit/... -coverpkg ./internal/config/db/sqlc/...
 
 server:
 	go run main.go
@@ -28,4 +31,4 @@ mock:
 mock_api:
 	go test -v -cover ./tests/mock/... -coverpkg ./internal/api/v1/...
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server mock mock_api
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc test server mock mock_api droppostgres

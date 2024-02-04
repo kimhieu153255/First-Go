@@ -1,8 +1,11 @@
 -- name: CreateUser :one
 INSERT INTO users (email, full_name, password) VALUES ($1, $2, $3) RETURNING *;
 
--- name: SelectUser :one
+-- name: GetUserByEmail :one
 select * from users where email = $1 limit 1;
+
+-- name: GetUserById :one
+select * from users where id = $1 limit 1;
 
 -- name: GetListUsers :many
 select * from users order by id;

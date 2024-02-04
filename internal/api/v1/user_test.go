@@ -1,4 +1,4 @@
-package mock_api
+package api_v1
 
 import (
 	"bytes"
@@ -10,7 +10,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	api_v1 "github.com/kimhieu153255/first-go/internal/api/v1"
 	mockdb "github.com/kimhieu153255/first-go/internal/config/db/mock"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
 	"github.com/kimhieu153255/first-go/pkg/utils"
@@ -96,6 +95,22 @@ func TestCreateUserApi(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
+		// {
+		// 	name: "HashPasswordError",
+		// 	body: gin.H{
+		// 		"password":  createUserParams.Password,
+		// 		"full_name": createUserParams.FullName,
+		// 		"email":     createUserParams.Email,
+		// 	},
+		// 	buildStubs: func(store *mockdb.MockStore) {
+		// 		store.EXPECT().
+		// 			CreateUser(gomock.Any(), gomock.Any()).
+		// 			Times(0)
+		// 	},
+		// 	checkResponse: func(recorder *httptest.ResponseRecorder) {
+		// 		require.Equal(t, http.StatusInternalServerError, recorder.Code)
+		// 	},
+		// },
 	}
 
 	for i := range testCases {
@@ -107,7 +122,7 @@ func TestCreateUserApi(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := api_v1.NewServer(store)
+			server := NewServer(store)
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
