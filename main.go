@@ -22,7 +22,10 @@ func main() {
 
 	store := db.NewStore(conn)
 
-	server := api_v1.NewServer(store)
+	server, err := api_v1.NewServer(store, config)
+	if err != nil {
+		panic(err)
+	}
 
 	err = server.Start(config.ServerAddress)
 	if err != nil {

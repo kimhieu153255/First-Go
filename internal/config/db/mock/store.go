@@ -50,18 +50,32 @@ func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockStore)(nil).CreateUser), arg0, arg1)
 }
 
-// DeleteUser mocks base method.
-func (m *MockStore) DeleteUser(arg0 context.Context, arg1 string) error {
+// DeleteUserByEmail mocks base method.
+func (m *MockStore) DeleteUserByEmail(arg0 context.Context, arg1 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteUser", arg0, arg1)
+	ret := m.ctrl.Call(m, "DeleteUserByEmail", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// DeleteUser indicates an expected call of DeleteUser.
-func (mr *MockStoreMockRecorder) DeleteUser(arg0, arg1 interface{}) *gomock.Call {
+// DeleteUserByEmail indicates an expected call of DeleteUserByEmail.
+func (mr *MockStoreMockRecorder) DeleteUserByEmail(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockStore)(nil).DeleteUser), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserByEmail", reflect.TypeOf((*MockStore)(nil).DeleteUserByEmail), arg0, arg1)
+}
+
+// DeleteUserByID mocks base method.
+func (m *MockStore) DeleteUserByID(arg0 context.Context, arg1 int64) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUserByID", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUserByID indicates an expected call of DeleteUserByID.
+func (mr *MockStoreMockRecorder) DeleteUserByID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUserByID", reflect.TypeOf((*MockStore)(nil).DeleteUserByID), arg0, arg1)
 }
 
 // GetListUsers mocks base method.

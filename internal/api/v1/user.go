@@ -34,6 +34,7 @@ func newCreatedUserResponse(user db.User) createUserResponse {
 	}
 }
 
+// Create user
 func (server *Server) createUser(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -67,7 +68,7 @@ func (server *Server) createUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(rsp, "Create user successfully"))
 }
 
-// get user by id
+// Get user by id
 func (server *Server) getUserByID(ctx *gin.Context) {
 	id, ok := ctx.Params.Get("id")
 	if !ok {
@@ -93,4 +94,43 @@ func (server *Server) getUserByID(ctx *gin.Context) {
 
 	rsp := newCreatedUserResponse(user)
 	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(rsp, "Get user successfully"))
+}
+
+// Health check
+func (server *Server) healthCheck(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(nil, "Health check successfully"))
+}
+
+// Get List user
+func (server *Server) getListUser(ctx *gin.Context) {
+	users, err := server.Store.GetListUsers(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, handlers.NewInternalServerError(err.Error()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(users, "Get list user successfully"))
+}
+
+// Delete user by id
+func (server *Server) deleteUserByID(ctx *gin.Context) {
+	id, ok := ctx.Params.Get("id")
+	if !ok {
+		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError("Invalid email parameter"))
+		return
+	}
+
+	idInt, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError(err.Error()))
+		return
+	}
+
+	err = server.Store.DeleteUserByID(ctx, idInt)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, handlers.NewInternalServerError(err.Error()))
+		return
+	}
+
+	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(nil, "Delete user successfully"))
 }

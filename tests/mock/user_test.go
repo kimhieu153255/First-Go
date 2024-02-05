@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,6 +14,7 @@ import (
 	api_v1 "github.com/kimhieu153255/first-go/internal/api/v1"
 	mockdb "github.com/kimhieu153255/first-go/internal/config/db/mock"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
+	config_env "github.com/kimhieu153255/first-go/internal/config/env"
 	"github.com/kimhieu153255/first-go/pkg/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -107,13 +109,20 @@ func TestCreateUserApi(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server := api_v1.NewServer(store)
+			config, err := config_env.NewConfig("../../")
+			if err != nil {
+				log.Fatal("cannot load config:", err)
+			}
+			server, err := api_v1.NewServer(store, config)
+			if err != nil {
+				log.Fatal("cant create server")
+			}
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/users"
+			url := "/v1/users"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 

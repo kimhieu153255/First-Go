@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -12,6 +13,7 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/kimhieu153255/first-go/internal/config/db/mock"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
+	config_env "github.com/kimhieu153255/first-go/internal/config/env"
 	"github.com/kimhieu153255/first-go/pkg/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -95,22 +97,6 @@ func TestCreateUserApi(t *testing.T) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
-		// {
-		// 	name: "HashPasswordError",
-		// 	body: gin.H{
-		// 		"password":  createUserParams.Password,
-		// 		"full_name": createUserParams.FullName,
-		// 		"email":     createUserParams.Email,
-		// 	},
-		// 	buildStubs: func(store *mockdb.MockStore) {
-		// 		store.EXPECT().
-		// 			CreateUser(gomock.Any(), gomock.Any()).
-		// 			Times(0)
-		// 	},
-		// 	checkResponse: func(recorder *httptest.ResponseRecorder) {
-		// 		require.Equal(t, http.StatusInternalServerError, recorder.Code)
-		// 	},
-		// },
 	}
 
 	for i := range testCases {
@@ -121,8 +107,14 @@ func TestCreateUserApi(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-
-			server := NewServer(store)
+			config, err := config_env.NewConfig(".")
+			if err != nil {
+				log.Fatal("cannot load config:", err)
+			}
+			server, err := NewServer(store, config)
+			if err != nil {
+				log.Fatal("cant create server")
+			}
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
