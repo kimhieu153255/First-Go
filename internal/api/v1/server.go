@@ -41,6 +41,7 @@ func NewServer(store db.Store, config config_env.Config) (*Server, error) {
 	userGroup.POST("", server.createUser)
 	userGroup.GET("/:id", server.getUserByID)
 	userGroup.GET("", server.getListUser)
+	userGroup.DELETE("/:id", server.deleteUserByID)
 
 	// Grouping for Auth
 	authGroup := v1Group.Group("/auth")

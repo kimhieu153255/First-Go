@@ -4,8 +4,6 @@ import (
 	"errors"
 	"net/http"
 
-	"strconv"
-
 	"github.com/gin-gonic/gin"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
 	handlers "github.com/kimhieu153255/first-go/pkg/handlers"
@@ -68,21 +66,19 @@ func (server *Server) createUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(rsp, "Create user successfully"))
 }
 
+type GetUserRequest struct {
+	ID int64 `uri:"id" binding:"required"`
+}
+
 // Get user by id
 func (server *Server) getUserByID(ctx *gin.Context) {
-	id, ok := ctx.Params.Get("id")
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError("Invalid email parameter"))
-		return
-	}
-
-	idInt, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
+	var req GetUserRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError(err.Error()))
 		return
 	}
 
-	user, err := server.Store.GetUserById(ctx, idInt)
+	user, err := server.Store.GetUserById(ctx, req.ID)
 	if err != nil {
 		if errors.Is(err, db.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, handlers.NewNotFoundError(err.Error()))
@@ -112,25 +108,27 @@ func (server *Server) getListUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(users, "Get list user successfully"))
 }
 
+type deleteUserByIDRequest struct {
+	ID int64 `uri:"id" binding:"required"`
+}
+
 // Delete user by id
 func (server *Server) deleteUserByID(ctx *gin.Context) {
-	id, ok := ctx.Params.Get("id")
-	if !ok {
-		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError("Invalid email parameter"))
-		return
-	}
-
-	idInt, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
+	var req deleteUserByIDRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, handlers.NewBadRequestError(err.Error()))
 		return
 	}
 
-	err = server.Store.DeleteUserByID(ctx, idInt)
+	user, err := server.Store.DeleteUserByID(ctx, req.ID)
 	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, handlers.NewNotFoundError(err.Error()))
+			return
+		}
 		ctx.JSON(http.StatusInternalServerError, handlers.NewInternalServerError(err.Error()))
 		return
 	}
 
-	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(nil, "Delete user successfully"))
+	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(user, "Delete user successfully"))
 }

@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +13,6 @@ import (
 	"github.com/golang/mock/gomock"
 	mockdb "github.com/kimhieu153255/first-go/internal/config/db/mock"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
-	config_env "github.com/kimhieu153255/first-go/internal/config/env"
 	"github.com/kimhieu153255/first-go/pkg/utils"
 	"github.com/stretchr/testify/require"
 )
@@ -107,21 +106,232 @@ func TestCreateUserApi(t *testing.T) {
 
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
-			config, err := config_env.NewConfig(".")
-			if err != nil {
-				log.Fatal("cannot load config:", err)
-			}
-			server, err := NewServer(store, config)
-			if err != nil {
-				log.Fatal("cant create server")
-			}
+
+			server := NewTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
 
-			url := "/users"
+			url := "/v1/users"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+			require.NoError(t, err)
+
+			server.Router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
+}
+
+func TestGetUserById(t *testing.T) {
+	testCases := []struct {
+		name          string
+		userID        any
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			userID: int64(1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserById(gomock.Any(), gomock.Eq(int64(1))).
+					Times(1).
+					Return(db.User{}, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "ID is not a number",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserById(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "Record not found",
+			userID: int64(-1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserById(gomock.Any(), gomock.Eq(int64(-1))).
+					Times(1).
+					Return(db.User{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name:   "InternalServiceError",
+			userID: int64(1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserById(gomock.Any(), gomock.Eq(int64(1))).
+					Times(1).
+					Return(db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := "/v1/users/" + fmt.Sprintf("%v", tc.userID)
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			server.Router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
+}
+
+func TestGetListUser(t *testing.T) {
+	testCases := []struct {
+		name          string
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetListUsers(gomock.Any()).
+					Times(1).
+					Return([]db.User{}, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "InternalServiceError",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetListUsers(gomock.Any()).
+					Times(1).
+					Return([]db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := "/v1/users"
+			request, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			server.Router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
+}
+
+func TestDeleteUserById(t *testing.T) {
+	testCases := []struct {
+		name          string
+		userID        any
+		buildStubs    func(store *mockdb.MockStore)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:   "OK",
+			userID: int64(1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					DeleteUserByID(gomock.Any(), gomock.Eq(int64(1))).
+					Times(1).
+					Return(db.User{}, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name:   "ID not valid",
+			userID: "a",
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					DeleteUserByID(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:   "InternalServiceError",
+			userID: int64(1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					DeleteUserByID(gomock.Any(), gomock.Eq(int64(1))).
+					Times(1).
+					Return(db.User{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name:   "Record not found",
+			userID: int64(1),
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					DeleteUserByID(gomock.Any(), gomock.Eq(int64(1))).
+					Times(1).
+					Return(db.User{}, db.ErrRecordNotFound)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := "/v1/users/" + fmt.Sprintf("%v", tc.userID)
+			request, err := http.NewRequest(http.MethodDelete, url, nil)
 			require.NoError(t, err)
 
 			server.Router.ServeHTTP(recorder, request)

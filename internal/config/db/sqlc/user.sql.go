@@ -33,22 +33,40 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	return i, err
 }
 
-const deleteUserByEmail = `-- name: DeleteUserByEmail :exec
-delete from users where email = $1
+const deleteUserByEmail = `-- name: DeleteUserByEmail :one
+delete from users where email = $1 returning id, email, full_name, password, created_at, role
 `
 
-func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) error {
-	_, err := q.db.Exec(ctx, deleteUserByEmail, email)
-	return err
+func (q *Queries) DeleteUserByEmail(ctx context.Context, email string) (User, error) {
+	row := q.db.QueryRow(ctx, deleteUserByEmail, email)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.Password,
+		&i.CreatedAt,
+		&i.Role,
+	)
+	return i, err
 }
 
-const deleteUserByID = `-- name: DeleteUserByID :exec
-delete from users where id = $1
+const deleteUserByID = `-- name: DeleteUserByID :one
+delete from users where id = $1 returning id, email, full_name, password, created_at, role
 `
 
-func (q *Queries) DeleteUserByID(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteUserByID, id)
-	return err
+func (q *Queries) DeleteUserByID(ctx context.Context, id int64) (User, error) {
+	row := q.db.QueryRow(ctx, deleteUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.FullName,
+		&i.Password,
+		&i.CreatedAt,
+		&i.Role,
+	)
+	return i, err
 }
 
 const getListUsers = `-- name: GetListUsers :many

@@ -51,11 +51,12 @@ func (mr *MockStoreMockRecorder) CreateUser(arg0, arg1 interface{}) *gomock.Call
 }
 
 // DeleteUserByEmail mocks base method.
-func (m *MockStore) DeleteUserByEmail(arg0 context.Context, arg1 string) error {
+func (m *MockStore) DeleteUserByEmail(arg0 context.Context, arg1 string) (db.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserByEmail", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteUserByEmail indicates an expected call of DeleteUserByEmail.
@@ -65,11 +66,12 @@ func (mr *MockStoreMockRecorder) DeleteUserByEmail(arg0, arg1 interface{}) *gomo
 }
 
 // DeleteUserByID mocks base method.
-func (m *MockStore) DeleteUserByID(arg0 context.Context, arg1 int64) error {
+func (m *MockStore) DeleteUserByID(arg0 context.Context, arg1 int64) (db.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "DeleteUserByID", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(db.User)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // DeleteUserByID indicates an expected call of DeleteUserByID.
