@@ -2,6 +2,7 @@ package api_v1
 
 import (
 	"bytes"
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -16,6 +17,11 @@ import (
 )
 
 func TestLoginApi(t *testing.T) {
+	user := db.User{
+		Email:    utils.RandomString(10) + "@gmail.com",
+		Password: utils.RandomString(10),
+	}
+	hashPassword, _ := utils.HashPassword(user.Password)
 	testCases := []struct {
 		name          string
 		body          gin.H
@@ -25,18 +31,64 @@ func TestLoginApi(t *testing.T) {
 		{
 			name: "OK",
 			body: gin.H{
-				"email":    "kimhieu@gmail.com",
-				"password": "123456",
+				"email":    user.Email,
+				"password": user.Password,
 			},
 			buildStubs: func(store *mockdb.MockStore) {
-				hashPassword, _ := utils.HashPassword("123456")
 				store.EXPECT().
-					GetUserByEmail(gomock.Any(), gomock.Eq("kimhieu@gmail.com")).
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
 					Return(db.User{Password: hashPassword}, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "BadRequest",
+			body: gin.H{
+				"email":    "invalid_email",
+				"password": user.Password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name: "No user",
+			body: gin.H{
+				"email":    user.Email,
+				"password": user.Password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(db.User{}, sql.ErrNoRows)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusForbidden, recorder.Code)
+			},
+		},
+		{
+			name: "Invalid password",
+			body: gin.H{
+				"email":    user.Email,
+				"password": user.Password,
+			},
+			buildStubs: func(store *mockdb.MockStore) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(db.User{Password: user.Password}, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
 			},
 		},
 	}

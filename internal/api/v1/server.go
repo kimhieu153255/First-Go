@@ -37,7 +37,7 @@ func NewServer(store db.Store, config config_env.Config) (*Server, error) {
 	})
 
 	// Grouping for user
-	userGroup := v1Group.Group("/users")
+	userGroup := v1Group.Group("/users").Use(AuthMiddleware(maker))
 	userGroup.POST("", server.createUser)
 	userGroup.GET("/:id", server.getUserByID)
 	userGroup.GET("", server.getListUser)

@@ -18,6 +18,46 @@ type MockStore struct {
 	recorder *MockStoreMockRecorder
 }
 
+// AddAccountBalanceByID implements db.Store.
+func (*MockStore) AddAccountBalanceByID(ctx context.Context, arg db.AddAccountBalanceByIDParams) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// CreateAccount implements db.Store.
+func (*MockStore) CreateAccount(ctx context.Context, arg db.CreateAccountParams) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// DeleteAccountByID implements db.Store.
+func (*MockStore) DeleteAccountByID(ctx context.Context, id int64) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// GetAccountByID implements db.Store.
+func (*MockStore) GetAccountByID(ctx context.Context, id int64) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// GetAccountByUserID implements db.Store.
+func (*MockStore) GetAccountByUserID(ctx context.Context, userID int64) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// GetListAccounts implements db.Store.
+func (*MockStore) GetListAccounts(ctx context.Context) ([]db.Account, error) {
+	panic("unimplemented")
+}
+
+// SelectAccountForUpdate implements db.Store.
+func (*MockStore) SelectAccountForUpdate(ctx context.Context, id int64) (db.Account, error) {
+	panic("unimplemented")
+}
+
+// UpdateAccountBalanceByID implements db.Store.
+func (*MockStore) UpdateAccountBalanceByID(ctx context.Context, arg db.UpdateAccountBalanceByIDParams) (db.Account, error) {
+	panic("unimplemented")
+}
+
 // MockStoreMockRecorder is the mock recorder for MockStore.
 type MockStoreMockRecorder struct {
 	mock *MockStore

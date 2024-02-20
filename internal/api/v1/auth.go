@@ -1,7 +1,6 @@
 package api_v1
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -40,9 +39,6 @@ func (server *Server) login(ctx *gin.Context) {
 		ctx.JSON(http.StatusForbidden, handlers.NewForbiddenError(err.Error()))
 		return
 	}
-
-	fmt.Println("user.Password: ", user.Password, "-end-")
-	fmt.Println("req.Password: ", req.Password, "-end-")
 
 	if !utils.CheckPassword(user.Password, req.Password) {
 		ctx.JSON(http.StatusUnauthorized, handlers.NewForbiddenError("Invalid password"))

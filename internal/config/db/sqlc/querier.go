@@ -9,13 +9,21 @@ import (
 )
 
 type Querier interface {
+	AddAccountBalanceByID(ctx context.Context, arg AddAccountBalanceByIDParams) (Account, error)
+	CreateAccount(ctx context.Context, arg CreateAccountParams) (Account, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteAccountByID(ctx context.Context, id int64) (Account, error)
 	DeleteUserByEmail(ctx context.Context, email string) (User, error)
 	DeleteUserByID(ctx context.Context, id int64) (User, error)
+	GetAccountByID(ctx context.Context, id int64) (Account, error)
+	GetAccountByUserID(ctx context.Context, userID int64) (Account, error)
+	GetListAccounts(ctx context.Context) ([]Account, error)
 	GetListUsers(ctx context.Context) ([]User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	GetUserById(ctx context.Context, id int64) (User, error)
+	SelectAccountForUpdate(ctx context.Context, id int64) (Account, error)
 	SelectUserForUpdate(ctx context.Context, id int64) (User, error)
+	UpdateAccountBalanceByID(ctx context.Context, arg UpdateAccountBalanceByIDParams) (Account, error)
 	UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error)
 }
 
