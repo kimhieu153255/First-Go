@@ -4,6 +4,9 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+	custom_validator "github.com/kimhieu153255/first-go/internal/api/validator"
 	db "github.com/kimhieu153255/first-go/internal/config/db/sqlc"
 	config_env "github.com/kimhieu153255/first-go/internal/config/env"
 	"github.com/kimhieu153255/first-go/pkg/token"
@@ -22,7 +25,20 @@ func NewServer(store db.Store, config config_env.Config) (*Server, error) {
 		return nil, fmt.Errorf("cannot create token maker: %w", err)
 	}
 	server := &Server{Store: store, Config: config, TokenMaker: maker}
+	server.AddValidator()
+
+	server.setUpRouter()
+	return server, nil
+}
+
+func (server *Server) Start(address string) error {
+	return server.Router.Run(address)
+}
+
+func (server *Server) setUpRouter() {
 	router := gin.Default()
+
+	// Add custom validator
 
 	v1Group := router.Group("/v1")
 
@@ -37,7 +53,7 @@ func NewServer(store db.Store, config config_env.Config) (*Server, error) {
 	})
 
 	// Grouping for user
-	userGroup := v1Group.Group("/users").Use(AuthMiddleware(maker))
+	userGroup := v1Group.Group("/users").Use(AuthMiddleware(server.TokenMaker))
 	userGroup.POST("", server.createUser)
 	userGroup.GET("/:id", server.getUserByID)
 	userGroup.GET("", server.getListUser)
@@ -48,10 +64,22 @@ func NewServer(store db.Store, config config_env.Config) (*Server, error) {
 	authGroup.POST("/login", server.login)
 	authGroup.POST("/register", server.register)
 
+	// Grouping for account
+	accountGroup := v1Group.Group("/accounts").Use(AuthMiddleware(server.TokenMaker))
+	accountGroup.POST("", server.createAccount)
+	accountGroup.GET("/:id", server.getAccountByID)
+	accountGroup.DELETE("/:id", server.deleteAccountByID)
+	accountGroup.GET("", server.getAccounts)
+
+	// Grouping for transfer
+	transferGroup := v1Group.Group("/transfers").Use(AuthMiddleware(server.TokenMaker))
+	transferGroup.POST("", server.Transfer)
+
 	server.Router = router
-	return server, nil
 }
 
-func (server *Server) Start(address string) error {
-	return server.Router.Run(address)
+func (server *Server) AddValidator() {
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		v.RegisterValidation("currency", custom_validator.ValidatorCurrency)
+	}
 }

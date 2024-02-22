@@ -10,6 +10,7 @@ import (
 type Store interface {
 	Querier
 	UpdateUserUseStore(ctx context.Context, arg UpdateUserTxParams) (UpdateUserResult, error)
+	TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error)
 }
 
 // Store provides all functions to execute db queries and transactions

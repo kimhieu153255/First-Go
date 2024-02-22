@@ -13,12 +13,13 @@ func TestJWTMaker(t *testing.T) {
 	newMaker, err := NewJWTMaker(secretStr)
 	require.NoError(t, err)
 
+	userID := utils.RandomInt(1, 1000)
 	email := utils.RandomString(20) + "@gmail.com"
 	fullname := utils.RandomString(20)
 	role := "test"
 	duration := time.Duration(time.Minute * 15)
 
-	token, payload, err := newMaker.CreateToken(email, role, fullname, duration)
+	token, payload, err := newMaker.CreateToken(userID, email, role, fullname, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 	require.NotZero(t, payload)

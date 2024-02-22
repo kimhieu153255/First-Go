@@ -6,7 +6,7 @@ import (
 )
 
 func (store *SQLStore) ExecTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.connPool.Begin(ctx) // to start a transaction
+	tx, err := store.connPool.Begin(ctx)
 	if err != nil {
 		return err
 	}

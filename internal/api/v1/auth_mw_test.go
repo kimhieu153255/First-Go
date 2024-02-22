@@ -15,6 +15,7 @@ import (
 )
 
 type addAuthParams struct {
+	userID   int64
 	email    string
 	role     string
 	fullname string
@@ -28,7 +29,7 @@ func addAuthorization(
 	authPram addAuthParams,
 	duration time.Duration,
 ) {
-	token, payload, err := tokenMaker.CreateToken(authPram.email, authPram.role, authPram.fullname, duration)
+	token, payload, err := tokenMaker.CreateToken(authPram.userID, authPram.email, authPram.role, authPram.fullname, duration)
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)
 

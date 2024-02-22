@@ -45,13 +45,13 @@ func (server *Server) login(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, accessPayload, err := server.TokenMaker.CreateToken(user.Email, user.Role, user.FullName, server.Config.AccessTokenDuration)
+	accessToken, accessPayload, err := server.TokenMaker.CreateToken(user.ID, user.Email, user.Role, user.FullName, server.Config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, handlers.NewInternalServerError(err.Error()))
 		return
 	}
 
-	refeshToken, refeshPayload, err := server.TokenMaker.CreateToken(user.Email, user.Role, user.FullName, server.Config.RefreshTokenDuration)
+	refeshToken, refeshPayload, err := server.TokenMaker.CreateToken(user.ID, user.Email, user.Role, user.FullName, server.Config.RefreshTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, handlers.NewInternalServerError(err.Error()))
 		return
@@ -66,7 +66,6 @@ func (server *Server) login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, handlers.NewSuccessResponse(res, "Login successfully"))
-
 }
 
 func (server *Server) register(ctx *gin.Context) {
