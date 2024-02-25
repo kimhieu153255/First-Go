@@ -1,6 +1,8 @@
 package db
 
-import "context"
+import (
+	"context"
+)
 
 type TransferTxResult struct {
 	FromAccount Account
@@ -10,24 +12,13 @@ type TransferTxResult struct {
 	ToEntry     Entry
 }
 
-type TransferTxParams struct {
-	FromAccountID int64  `json:"from_account_id"`
-	ToAccountID   int64  `json:"to_account_id"`
-	Amount        int64  `json:"amount"`
-	Currency      string `json:"currency"`
-}
-
-func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (TransferTxResult, error) {
+func (store *SQLStore) TransferTx(ctx context.Context, arg AddTransferParams) (TransferTxResult, error) {
 	var result TransferTxResult
 	err := store.ExecTx(ctx, func(q *Queries) error {
 		var err error
 
-		result.Transfer, err = q.AddTransfer(ctx, AddTransferParams{
-			FromAccountID: arg.FromAccountID,
-			ToAccountID:   arg.ToAccountID,
-			Amount:        arg.Amount,
-			Currency:      arg.Currency,
-		})
+		result.Transfer, err = q.AddTransfer(ctx, arg)
+
 		if err != nil {
 			return err
 		}
@@ -51,22 +42,28 @@ func (store *SQLStore) TransferTx(ctx context.Context, arg TransferTxParams) (Tr
 			return err
 		}
 
-		result.FromAccount, err = q.AddAccountBalanceByID(ctx, AddAccountBalanceByIDParams{
-			Amount: -arg.Amount,
-			ID:     arg.FromAccountID,
-		})
-		if err != nil {
-			return err
+		if arg.FromAccountID < arg.ToAccountID {
+			result.FromAccount, result.ToAccount, err = changeAccountBalance(ctx, q, arg.FromAccountID, arg.ToAccountID, arg.Amount)
+		} else {
+			result.ToAccount, result.FromAccount, err = changeAccountBalance(ctx, q, arg.ToAccountID, arg.FromAccountID, arg.Amount)
 		}
-
-		result.ToAccount, err = q.AddAccountBalanceByID(ctx, AddAccountBalanceByIDParams{
-			Amount: arg.Amount,
-			ID:     arg.ToAccountID,
-		})
-		if err != nil {
-			return err
-		}
-		return nil
+		return err
 	})
 	return result, err
+}
+
+func changeAccountBalance(ctx context.Context, q *Queries, fromAccountId, toAccountID, amount int64) (Account, Account, error) {
+	fromAccount, err := q.AddAccountBalanceByID(ctx, AddAccountBalanceByIDParams{
+		Amount: -amount,
+		ID:     fromAccountId,
+	})
+	if err != nil {
+		return fromAccount, Account{}, err
+	}
+
+	toAccount, err := q.AddAccountBalanceByID(ctx, AddAccountBalanceByIDParams{
+		Amount: amount,
+		ID:     toAccountID,
+	})
+	return fromAccount, toAccount, err
 }

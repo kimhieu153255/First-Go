@@ -41,7 +41,7 @@ func (server *Server) Transfer(ctx *gin.Context) {
 		return
 	}
 
-	transferResult, err := server.Store.TransferTx(ctx, db.TransferTxParams{
+	transferResult, err := server.Store.TransferTx(ctx, db.AddTransferParams{
 		FromAccountID: req.FromAccountID,
 		ToAccountID:   req.ToAccountID,
 		Amount:        req.Amount,
